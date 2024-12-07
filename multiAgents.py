@@ -150,6 +150,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         "*** YOUR CODE HERE ***"
         util.raiseNotDefined()
 
+# Iulia Anca
 class ExpectimaxAgent(MultiAgentSearchAgent):
     """
       Your expectimax agent (question 4)
@@ -163,8 +164,68 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
         legal moves.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        # util.raiseNotDefined()
 
+        actiuniLegale = gameState.getLegalActions(0)
+        if not actiuniLegale:
+            return Directions.STOP
+
+        scoruri = []
+        for actiune in actiuniLegale:
+            succesor = gameState.generateSuccessor(0, actiune)
+            scor = self.calculeazaExpectimax(succesor, self.depth, 1)
+            scoruri.append(scor)
+            
+        # scorMaxim = max(scoruri)
+
+        bestActions = []
+        for index, scor in enumerate(scoruri):
+            if scor == max(scoruri):
+                bestActions.append(index)
+                
+        choice = random.choice(bestActions)
+
+        return actiuniLegale[choice]
+
+    def calculeazaExpectimax(self, stare, adancime, indexAgent):
+        if stare.isWin() or stare.isLose() or adancime == 0:
+            return self.evaluationFunction(stare)
+
+        if indexAgent == 0:
+            valoareMaxima = float('-inf')
+            actiuni = stare.getLegalActions(indexAgent)
+            for actiune in actiuni:
+                succesor = stare.generateSuccessor(indexAgent, actiune)
+                scor = self.calculeazaExpectimax(succesor, adancime, 1)
+                if scor > valoareMaxima:
+                    valoareMaxima = scor
+            return valoareMaxima
+
+        nextAgent = indexAgent + 1
+        if nextAgent == stare.getNumAgents():
+            nextAgent = 0
+            adancime -= 1
+
+        actiuni = stare.getLegalActions(indexAgent)
+        if not actiuni:
+            return self.evaluationFunction(stare)
+
+        probabilitate = 1 / len(actiuni)
+
+        sumaValori = 0
+        actiuni = stare.getLegalActions(indexAgent)
+        for actiune in actiuni:
+            succesor = stare.generateSuccessor(indexAgent, actiune)
+            scor = self.calculeazaExpectimax(succesor, adancime, nextAgent)
+            sumaValori += scor * probabilitate
+
+        return sumaValori
+        
+
+
+
+
+# Iulia Anca
 def betterEvaluationFunction(currentGameState: GameState):
     """
     Your extreme ghost-hunting, pellet-nabbing, food-gobbling, unstoppable
@@ -173,7 +234,43 @@ def betterEvaluationFunction(currentGameState: GameState):
     DESCRIPTION: <write something here so we know what you did>
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    capsule = currentGameState.getCapsules()
+    scorCurent = currentGameState.getScore()
+    pozitiePacman = currentGameState.getPacmanPosition()
+    stariFantome = currentGameState.getGhostStates()
+    mancare = currentGameState.getFood().asList()
+
+    scorCapsule = 0
+    if capsule:
+
+        distanteCapsule = []
+        for capsula in capsule:
+            distanta = manhattanDistance(capsula, pozitiePacman)
+            distanteCapsule.append(distanta)
+
+        distantaMinimaCapsula = min(distanteCapsule)
+        scorCapsule = 25.0 / (1 + distantaMinimaCapsula)
+
+    scorMancare = 0
+    if mancare:
+
+        distanteMancare = []
+        for manc in mancare:
+            distanteMancare.append(manhattanDistance(manc, pozitiePacman))
+
+        distantaMinimaMancare = min(distanteMancare)
+        scorMancare = 5.0 / (1 + distantaMinimaMancare)
+
+    penalizareFantome = 0
+    for fantoma in stariFantome:
+        pozitieFantoma = fantoma.getPosition()
+        distantaFantoma = manhattanDistance(pozitiePacman, pozitieFantoma)
+        if fantoma.scaredTimer > 0:
+            penalizareFantome += 300.0 / (1 + distantaFantoma)
+        elif distantaFantoma < 2:
+            penalizareFantome -= 1000.0 / (1 + distantaFantoma)
+
+    return scorCurent + scorCapsule + scorMancare + penalizareFantome
 
 # Abbreviation
 better = betterEvaluationFunction
