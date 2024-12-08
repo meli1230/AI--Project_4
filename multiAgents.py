@@ -49,8 +49,6 @@ class ReflexAgent(Agent):
         chosenIndex = random.choice(bestIndices) # Pick randomly among the best
 
         "Add more of your code here if you want to"
-        # @Author: Melisa Marian
-        #if more code added here
 
         return legalMoves[chosenIndex]
 
@@ -76,7 +74,27 @@ class ReflexAgent(Agent):
         newGhostStates = successorGameState.getGhostStates()
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
 
+        "*** YOUR CODE HERE ***"
         # @Author: Marian Melisa
+
+        all_food = newFood.asList() #get all food positions from the successorGameState
+
+        if all_food:
+            distance_to_all_food = [manhattanDistance(newPos, food_item) for food_item in all_food] #compute the distances to each food item
+            closest_food_item = min(distance_to_all_food) #get the closest food item
+            successorGameState.data.score += 10/(1+closest_food_item) #the closer to food pacman is, the higher the reward
+            successorGameState.data.score -= len(all_food)*5 #penalize pacman for each food that has not been eaten yet
+                                                        #this line is not absolutely necessary; if we omit it, we get the 4th score under 1000, which does not affect the max grade
+                                                        #however, keeping it in gets us a better performance of pacman
+
+        for i in range(len(newGhostStates)):
+            position_of_ghost = newGhostStates[i].getPosition() #get ghost state
+            distance_to_ghost = manhattanDistance(newPos, position_of_ghost) #calculate the distance to ghost
+            if newScaredTimes[i] > 0: #check if the ghost is in the scared state
+                successorGameState.data.score += 100/(1+distance_to_ghost)
+            elif distance_to_ghost < 2: #if the ghost is not scared and the ghost is close
+                    successorGameState.data.score -= 1000 #penalize to avoid it
+
         return successorGameState.getScore()
 
 def scoreEvaluationFunction(currentGameState: GameState):
@@ -137,8 +155,77 @@ class MinimaxAgent(MultiAgentSearchAgent):
         gameState.isLose():
         Returns whether or not the game state is a losing state
         """
+
+        "*** YOUR CODE HERE ***"
         # @Author: Melisa Marian
-        util.raiseNotDefined()
+
+
+        def mini(ghost_position, current_depth, gameState):
+            #minimize the score for ghosts
+            possible_moves = gameState.getLegalActions(ghost_position)
+            if not possible_moves:
+                return self.evaluationFunction(gameState)
+
+            ghost_score = float('inf') #initialize ghost_score to infinity, which is the worst case for pacman
+            number_of_agents = gameState.getNumAgents() #get the number of agents (pacman + ghosts)
+            next_agent_position = (ghost_position+1) % number_of_agents #who has the next move #get the agent that is about to make a move
+
+            if next_agent_position == 0:  #if agent is pacman
+                next_depth = current_depth + 1 #increment depth
+            else: #if agent is not pacman
+                next_depth = current_depth #depth stays the same
+
+            for move in possible_moves:
+                next_gameState = gameState.generateSuccessor(ghost_position, move) #generate successor state
+                agent_score = minimax (next_agent_position, next_depth, next_gameState) #recursive call to minimax
+                ghost_score = min(ghost_score, agent_score) #update the lowest score
+
+            return ghost_score
+
+        def maxi(pacman_position, current_depth, gameState):
+            #maximize the score for Pacman
+            possible_moves = gameState.getLegalActions(pacman_position)
+            if not possible_moves:
+                return self.evaluationFunction(gameState)
+
+            pacman_score = float('-inf')  # initialize pacman_score to negative infinity, which is the best case for pacman
+
+            for move in possible_moves:
+                next_gameState = gameState.generateSuccessor(pacman_position, move)  #generate successor state
+                agent_score = minimax(1, current_depth, next_gameState)  #recursive call to minimax
+                pacman_score = max(pacman_score, agent_score)  #update the highest score
+
+            return pacman_score
+
+
+        def minimax (agent_position, current_depth, gameState):
+            if gameState.isWin() or gameState.isLose() or current_depth == self.depth: #checks if the game has reached the finish line
+                return self.evaluationFunction(gameState)
+
+            if agent_position == 0: #checks if it is pacman's turn
+                return maxi (agent_position, current_depth, gameState)
+            else:
+                return mini (agent_position, current_depth, gameState)
+
+
+        #logic of getAction()
+        possible_moves = gameState.getLegalActions(0) #pacman = agent 0
+
+        best_move_to_make = None #initialize best move to null
+        best_score = float('-inf') #initialize best score to negative infinity
+
+        for move in possible_moves:
+            next_state = gameState.generateSuccessor(0, move) #generate game state after making a move
+            move_rating = minimax(1, 0, next_state) #evaluate this move with minimax
+                                                                        # 1 -> ghost is 1, since pacman is 0
+                                                                        # 0 -> current depth of minimax
+
+            if move_rating > best_score: #if the score for this is better than the best score
+                best_score = move_rating #update best score
+                best_move_to_make = move #update best move
+
+        return best_move_to_make
+
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
@@ -149,8 +236,10 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         """
         Returns the minimax action using self.depth and self.evaluationFunction
         """
+        "*** YOUR CODE HERE ***"
         # @Author: Melisa Marian
         util.raiseNotDefined()
+
 
 # Iulia Anca
 class ExpectimaxAgent(MultiAgentSearchAgent):
