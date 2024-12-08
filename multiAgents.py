@@ -49,6 +49,8 @@ class ReflexAgent(Agent):
         chosenIndex = random.choice(bestIndices) # Pick randomly among the best
 
         "Add more of your code here if you want to"
+        # @Author: Melisa Marian
+        #if more code added here
 
         return legalMoves[chosenIndex]
 
@@ -74,7 +76,7 @@ class ReflexAgent(Agent):
         newGhostStates = successorGameState.getGhostStates()
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
 
-        "*** YOUR CODE HERE ***"
+        # @Author: Marian Melisa
         return successorGameState.getScore()
 
 def scoreEvaluationFunction(currentGameState: GameState):
@@ -135,7 +137,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
         gameState.isLose():
         Returns whether or not the game state is a losing state
         """
-        "*** YOUR CODE HERE ***"
+        # @Author: Melisa Marian
         util.raiseNotDefined()
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
@@ -147,7 +149,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         """
         Returns the minimax action using self.depth and self.evaluationFunction
         """
-        "*** YOUR CODE HERE ***"
+        # @Author: Melisa Marian
         util.raiseNotDefined()
 
 # Iulia Anca
