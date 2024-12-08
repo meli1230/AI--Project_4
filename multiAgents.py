@@ -166,9 +166,9 @@ class MinimaxAgent(MultiAgentSearchAgent):
             if not possible_moves:
                 return self.evaluationFunction(gameState)
 
-            ghost_score = float('inf') #initialize ghost_score to infinity, which is the worst case for pacman
+            ghost_score = float('inf') #initialize ghost_score to infinity, which is the best case for pacman
             number_of_agents = gameState.getNumAgents() #get the number of agents (pacman + ghosts)
-            next_agent_position = (ghost_position+1) % number_of_agents #who has the next move #get the agent that is about to make a move
+            next_agent_position = (ghost_position+1) % number_of_agents #get the agent that is about to make a move
 
             if next_agent_position == 0:  #if agent is pacman
                 next_depth = current_depth + 1 #increment depth
@@ -188,7 +188,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
             if not possible_moves:
                 return self.evaluationFunction(gameState)
 
-            pacman_score = float('-inf')  # initialize pacman_score to negative infinity, which is the best case for pacman
+            pacman_score = float('-inf')  # initialize pacman_score to negative infinity, which is the worst case for pacman
 
             for move in possible_moves:
                 next_gameState = gameState.generateSuccessor(pacman_position, move)  #generate successor state
@@ -238,7 +238,80 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         """
         "*** YOUR CODE HERE ***"
         # @Author: Melisa Marian
-        util.raiseNotDefined()
+
+        def mini(ghost_position, score, state, alpha, beta):
+            #maximize the score for ghosts
+            ghost_score = float('inf')  #initialize ghost_score to infinity, which is the best case for pacman
+            possible_moves = state.getLegalActions(ghost_position)
+
+            if not possible_moves:
+                return self.evaluationFunction(state)
+
+            next_agent_position = ghost_position + 1 #get the agent that is about to make a move
+
+            if next_agent_position == state.getNumAgents():  #check if last move was made my ghost
+                next_agent_position = 0  #agent is now pacman
+                score += 1  #increment depth
+
+            for move in possible_moves:
+                next_gameState = state.generateSuccessor(ghost_position, move) #generate successor state
+                ghost_score = min(ghost_score, alphaBetaPruning(next_agent_position, score, next_gameState, alpha, beta)) #recursive call to abpruning
+
+                if ghost_score < alpha: #check if the lowest score is less than the alpha threshold
+                    return ghost_score  #alpha pruning
+
+                beta = min(beta, ghost_score) #update the beta threshold to the minimum of its current value
+
+            return ghost_score
+
+
+        def maxi(pacman_position, score, state, alpha, beta):
+            #maximize the score for pacman
+            pacman_score = float('-inf') #initialize pacman_score to negative infinity, which is the worst case for pacman
+            possible_moves = state.getLegalActions(pacman_position)
+
+            if not possible_moves:
+                return self.evaluationFunction(state)
+
+            for move in possible_moves:
+                next_GameState = state.generateSuccessor(pacman_position, move)
+                pacman_score = max(pacman_score, alphaBetaPruning(1, score, next_GameState, alpha, beta)) #recursive call to abpruning
+
+                if pacman_score > beta: #check if the highest score is more than the beta threshold
+                    return pacman_score  #beta pruning
+
+                alpha = max(alpha, pacman_score) #update the alpha threshold to the maximum of it current value
+
+            return pacman_score
+
+
+
+        def alphaBetaPruning(agent_position, score, state, alpha, beta):
+            if state.isWin() or state.isLose() or score == self.depth: #if the game is finished
+                return self.evaluationFunction(state)  #the maximum depth is reached
+
+            if agent_position == 0: #check if it is pacman's turn
+                return maxi(agent_position, score, state, alpha, beta)
+            else:
+                return mini(agent_position, score, state, alpha, beta)
+
+
+        #logic of getAction()
+        alpha_maxi = float('-inf') #initialize alpha to negative infinity
+        beta_mini = float('inf') #initialize beta to infinity
+        best_move_to_make = None #initialize best move to null
+        possible_moves_to_make = gameState.getLegalActions(0) #get the possible moves pacman can make
+
+        for move in possible_moves_to_make:
+            next_state = gameState.generateSuccessor(0, move) #generate game state after making a move
+            move_rating = alphaBetaPruning(1, 0, next_state, alpha_maxi, beta_mini) #evaluate this move with abpruning
+
+            if move_rating > alpha_maxi:  #if the score for this is better than the best score
+                alpha_maxi = move_rating  #update alpha
+                best_move_to_make = move  #update best move
+
+        return best_move_to_make
+
 
 
 # Iulia Anca
