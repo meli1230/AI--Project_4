@@ -11,11 +11,11 @@ Please note that the project has been solved in teams of 2:
 This project extends basic search strategies to multi-agent environments, applying **game theory** techniques like **Minimax, Alpha-Beta Pruning, and Expectimax** to optimize Pacman's gameplay.
 
 ### **Implemented Algorithms**
-- **Reflex Agent:** A basic agent that reacts to food and ghosts.
-- **Minimax Search:** Computes an optimal strategy against adversarial ghosts.
-- **Alpha-Beta Pruning:** Optimizes Minimax by pruning unnecessary branches.
-- **Expectimax Search:** Handles probabilistic ghost behavior.
-- **Improved Evaluation Function:** Enhances Pacman’s decision-making.
+- **Reflex Agent:** A basic agent that reacts to food and ghosts
+- **Minimax Search:** Computes an optimal strategy against adversarial ghosts
+- **Alpha-Beta Pruning:** Optimizes Minimax by pruning unnecessary branches
+- **Expectimax Search:** Handles probabilistic ghost behavior
+- **Improved Evaluation Function:** Enhances Pacman’s decision-making
 
 ## **How to Run the Multi-Agent Agents**
 Test different strategies by running:
@@ -52,6 +52,6 @@ python autograder.py
 ```
 
 ## **File Structure**
-- **`multiAgents.py`** – Implements multi-agent decision-making algorithms.
-- **`pacman.py`** – Main game engine.
-- **`util.py`** – Helper functions for data structures.
+- **`multiAgents.py`** – Implements multi-agent decision-making algorithms
+- **`pacman.py`** – Main game engine
+- **`util.py`** – Helper functions for data structures
