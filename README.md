@@ -5,7 +5,7 @@ This project introduces **multi-agent decision-making** techniques to model inte
 This project is for educational purposes and follows the **Berkeley AI Pacman Project** framework. <br/>
 Please note that the project has been solved in teams of 2:
 - Melisa Marian's work is marked under `@Author: Melisa Marian`
-- Iulia Ana Anca's work is marked under `Iulia Anca`
+- Iulia Ana Anca's work is marked under `#Iulia Anca`
 
 ## **Overview**
 This project extends basic search strategies to multi-agent environments, applying **game theory** techniques like **Minimax, Alpha-Beta Pruning, and Expectimax** to optimize Pacman's gameplay.
